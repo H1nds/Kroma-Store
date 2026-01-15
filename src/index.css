@@ -1,0 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    /* Tu color Milk de fondo */
+    background-color: #fdfdf1;
+    /* Tu color Gray Blue para textos */
+    color: #2b323f;
+    /* La nueva tipografía moderna */
+    font-family: 'Montserrat', sans-serif;
+}
+
+/* CLASE MÁGICA: Esto hará que el fondo blanco de tus JPGs 
+   se vuelva transparente para que se integren bien */
+.blend-multiply {
+    mix-blend-mode: multiply;
+}
+
+.font-kroma-logo {
+    font-family: 'Playfair Display', serif;
+    letter-spacing: 0.05em; /* Un poquito de espacio entre letras queda más premium */
+}
