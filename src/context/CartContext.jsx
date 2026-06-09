@@ -57,6 +57,7 @@ export const CartProvider = ({ children }) => {
     // --- FUNCIÓN: LIMPIAR TODO ---
     const clearCart = () => setCart([])
 
+
     // --- DATOS COMPUTADOS (Totales) ---
     // Calculamos cuántos items hay en total (para el puntito rojo del navbar)
     const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0)

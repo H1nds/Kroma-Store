@@ -3,6 +3,7 @@ import { Filter, Search, Loader } from 'lucide-react'
 import { getAllProducts } from '../services/productService' // <--- Usamos el servicio real
 import ProductCard from '../components/ProductCard'
 import FilterSidebar from '../components/FilterSidebar'
+import LoadingScreen from '../components/LoadingScreen'
 
 const CatalogPage = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
@@ -63,16 +64,7 @@ const CatalogPage = () => {
     }
 
     // --- VISTA DE CARGA ---
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-[#fdfdf1] flex items-center justify-center">
-                <div className="flex flex-col items-center gap-4">
-                    <Loader className="animate-spin text-[#EC5E27]" size={48} />
-                    <p className="font-kroma-logo text-[#2b323f] animate-pulse">Cargando colección...</p>
-                </div>
-            </div>
-        )
-    }
+    if (loading) return <LoadingScreen />
 
     return (
         <div className="bg-[#fdfdf1] min-h-screen pt-24 pb-12">

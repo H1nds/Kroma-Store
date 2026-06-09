@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { ArrowLeft, ShoppingBag, Star, Truck, ShieldCheck, Loader } from 'lucide-react'
 import { getProductById } from '../services/productService'
 import { useCart } from '../context/CartContext'
+import Swal from 'sweetalert2'
 
 const ProductDetailPage = () => {
     const { id } = useParams()
@@ -29,7 +30,15 @@ const ProductDetailPage = () => {
     const handleAddToCart = () => {
         if (product) {
             addToCart(product, quantity)
-            alert(`¡Listo! Agregaste ${quantity}x ${product.name} al carrito.`)
+            Swal.fire({
+                title: '¡Agregado!',
+                text: `Añadiste ${quantity}x ${product.name} al carrito.`,
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'bottom-end'
+            })
         }
     }
 

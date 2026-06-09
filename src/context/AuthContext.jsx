@@ -5,7 +5,10 @@ import {
     signOut,
     onAuthStateChanged,
     GoogleAuthProvider,
-    signInWithPopup
+    signInWithPopup,
+    updateProfile,
+    updateEmail,
+    updatePassword
 } from "firebase/auth";
 import { auth } from "../firebase/config";
 
@@ -47,9 +50,34 @@ export const AuthProvider = ({ children }) => {
         return () => unsubscribe();
     }, []);
 
+    // Función para actualizar nombre, email y contraseña
+    const updateProfileData = async (name, email, password) => {
+        const user = auth.currentUser;
+
+        try {
+            // 1. Actualizar Nombre de Usuario
+            if (name) await updateProfile(user, { displayName: name });
+
+            // 2. Actualizar Email
+            if (email) await updateEmail(user, email);
+
+            // 3. Actualizar Contraseña
+            if (password) await updatePassword(user, password);
+
+        } catch (error) {
+            // Capturamos el error específico de seguridad
+            if (error.code === 'auth/requires-recent-login') {
+                throw new Error("Por seguridad, inicia sesión nuevamente para realizar estos cambios.");
+            }
+            // Lanzamos cualquier otro error normal (como contraseña débil)
+            throw error;
+        }
+    };
+
     return (
-        <AuthContext.Provider value={{ user, signup, login, logout, loginWithGoogle, loading }}>
+        <AuthContext.Provider value={{ user, signup, login, logout, loginWithGoogle, loading, updateProfileData }}>
             {children}
         </AuthContext.Provider>
     );
+
 };

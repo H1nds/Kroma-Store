@@ -23,3 +23,12 @@ body {
     font-family: 'Playfair Display', serif;
     letter-spacing: 0.05em; /* Un poquito de espacio entre letras queda más premium */
 }
+
+/* Ocultar el botón de autocompletado de Chrome */
+input::-webkit-credentials-auto-fill-button {
+    visibility: hidden;
+    display: none !important;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+}

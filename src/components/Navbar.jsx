@@ -58,10 +58,10 @@ const Navbar = () => {
                     {/* --- ICONOS DE ACCIÓN (Derecha) --- */}
                     <div className="hidden md:flex items-center space-x-6 text-[#2b323f]">
 
-                        {/* Buscador (Visual por ahora) */}
-                        <button className="hover:text-[#EC5E27] transition-colors">
+                        {/* Buscador (Atajo global al catálogo) */}
+                        <Link to="/catalogo" className="hover:text-[#EC5E27] transition-colors" title="Buscar fragancias">
                             <Search size={20} strokeWidth={1.5} />
-                        </button>
+                        </Link>
 
                         {/* Icono de Usuario Inteligente */}
                         {/* Si hay user -> va a Perfil. Si no -> va a Login */}

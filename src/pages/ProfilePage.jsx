@@ -1,5 +1,5 @@
 import { useAuth } from '../context/AuthContext'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { LogOut, User, Package } from 'lucide-react'
 
 const ProfilePage = () => {
@@ -25,7 +25,7 @@ const ProfilePage = () => {
                             {user?.email?.charAt(0).toUpperCase()}
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold">{user?.email}</h2>
+                            <h2 className="text-xl font-bold">{user?.displayName || user?.email}</h2>
                             <span className="text-gray-400 text-sm">Miembro de Kroma</span>
                         </div>
                     </div>
@@ -33,19 +33,21 @@ const ProfilePage = () => {
                     {/* Opciones */}
                     <div className="p-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                            {/* Tarjeta de Pedidos (A futuro) */}
-                            <div className="p-6 border border-gray-100 rounded-xl hover:border-[#EC5E27] transition-colors cursor-pointer group">
+
+                            {/* Tarjeta de Pedidos */}
+                            <Link to="/mis-pedidos" className="p-6 border border-gray-100 rounded-xl hover:border-[#EC5E27] transition-colors cursor-pointer group block">
                                 <Package className="text-[#EC5E27] mb-4 group-hover:scale-110 transition-transform" size={32} />
                                 <h3 className="font-bold text-[#2b323f] mb-2">Mis Pedidos</h3>
                                 <p className="text-sm text-gray-500">Revisa el estado de tus compras recientes.</p>
-                            </div>
+                            </Link>
 
-                            {/* Tarjeta de Datos (A futuro) */}
-                            <div className="p-6 border border-gray-100 rounded-xl hover:border-[#EC5E27] transition-colors cursor-pointer group">
+                            {/* Tarjeta de Datos Personales funcional */}
+                            <Link to="/datos-personales" className="p-6 border border-gray-100 rounded-xl hover:border-[#EC5E27] transition-colors cursor-pointer group block">
                                 <User className="text-[#EC5E27] mb-4 group-hover:scale-110 transition-transform" size={32} />
                                 <h3 className="font-bold text-[#2b323f] mb-2">Datos Personales</h3>
                                 <p className="text-sm text-gray-500">Actualiza tu dirección y contraseña.</p>
-                            </div>
+                            </Link>
+
                         </div>
 
                         <button

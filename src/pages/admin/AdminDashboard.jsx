@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { getAllProducts, deleteProduct } from '../../services/productService'
 import { Plus, Edit, Trash2, Package } from 'lucide-react'
 import { motion } from 'framer-motion'
+import Swal from 'sweetalert2'
 
 const AdminDashboard = () => {
     const [products, setProducts] = useState([])
@@ -20,14 +21,31 @@ const AdminDashboard = () => {
     }
 
     const handleDelete = async (id, imageUrl) => {
-        if (window.confirm("¿Estás seguro de eliminar este producto? Esta acción no se puede deshacer.")) {
+        const result = await Swal.fire({
+            title: '¿Eliminar producto?',
+            text: "Esta acción no se puede deshacer.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#EC5E27',
+            cancelButtonColor: '#2b323f',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        })
+
+        if (result.isConfirmed) {
             await deleteProduct(id, imageUrl)
-            fetchProducts() // Recargar lista
+            fetchProducts()
+            Swal.fire({
+                title: '¡Eliminado!',
+                text: 'El producto ha sido borrado.',
+                icon: 'success',
+                confirmButtonColor: '#2b323f'
+            })
         }
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 pt-28 pb-12 px-4">
+        <div className="min-h-screen bg-[#fdfdf1] pt-28 pb-12 px-4">
             <div className="max-w-7xl mx-auto">
 
                 {/* Encabezado */}
@@ -41,6 +59,12 @@ const AdminDashboard = () => {
                         className="bg-[#2b323f] text-white px-6 py-3 rounded-full flex items-center gap-2 font-bold uppercase tracking-wider hover:bg-[#EC5E27] transition-colors shadow-lg"
                     >
                         <Plus size={20} /> Nuevo Producto
+                    </Link>
+                    <Link
+                        to="/admin/pedidos"
+                        className="border-2 border-[#2b323f] text-[#2b323f] px-6 py-3 rounded-full flex items-center gap-2 font-bold uppercase tracking-wider hover:bg-gray-100 transition-colors"
+                    >
+                        Ver Pedidos
                     </Link>
                 </div>
 
@@ -81,15 +105,20 @@ const AdminDashboard = () => {
                                         <td className="p-6 text-gray-600">{product.category}</td>
                                         <td className="p-6 font-medium">S/ {parseFloat(product.price).toFixed(2)}</td>
                                         <td className="p-6 text-right space-x-2">
-                                            <button className="p-2 text-gray-400 hover:text-[#2b323f] transition-colors">
-                                                <Edit size={18} />
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(product.id, product.image)}
-                                                className="p-2 text-gray-400 hover:text-red-500 transition-colors"
-                                            >
-                                                <Trash2 size={18} />
-                                            </button>
+                                            <div className="flex items-center gap-3 justify-end h-full"> {/* 'items-center' alinea verticalmente */}
+                                                <Link
+                                                    to={`/admin/editar/${product.id}`}
+                                                    className="p-2 text-gray-400 hover:text-[#EC5E27] transition-colors flex items-center"
+                                                >
+                                                    <Edit size={18} />
+                                                </Link>
+                                                <button
+                                                    onClick={() => handleDelete(product.id, product.image)}
+                                                    className="p-2 text-gray-400 hover:text-red-500 transition-colors flex items-center"
+                                                >
+                                                    <Trash2 size={18} />
+                                                </button>
+                                            </div>
                                         </td>
                                     </motion.tr>
                                 ))}

@@ -26,11 +26,11 @@ const RegisterPage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-[#fdfdf1] flex items-center justify-center p-4">
+        <div className="min-h-screen bg-[#fdfdf1] flex justify-center p-4 py-12 overflow-y-auto">
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-gray-100"
+                className="m-auto bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-gray-100"
             >
                 <div className="p-8">
                     <div className="text-center mb-6">

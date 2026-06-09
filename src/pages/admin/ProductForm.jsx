@@ -1,10 +1,14 @@
-import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { createProduct, uploadProductImage } from '../../services/productService'
+import { useState, useEffect } from 'react'
+import { useNavigate, Link, useParams } from 'react-router-dom'
+import { createProduct, uploadProductImage, getProductById, updateProduct } from '../../services/productService'
 import { Upload, ArrowLeft, Loader, AlertTriangle, CheckCircle } from 'lucide-react'
+import Swal from 'sweetalert2'
 
 const ProductForm = () => {
     const navigate = useNavigate()
+    const { id } = useParams()
+    const isEditing = !!id
+
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
 
@@ -20,6 +24,22 @@ const ProductForm = () => {
 
     const [imageFile, setImageFile] = useState(null)
     const [preview, setPreview] = useState(null)
+
+    useEffect(() => {
+        if (isEditing) {
+            const loadData = async () => {
+                const product = await getProductById(id)
+                if (product) {
+                    setFormData({
+                        name: product.name, brand: product.brand, price: product.price,
+                        category: product.category, description: product.description, isFeatured: product.isFeatured || false
+                    })
+                    setPreview(product.image) // Mostramos la imagen actual
+                }
+            }
+            loadData()
+        }
+    }, [id, isEditing])
 
     // Manejar inputs de texto
     const handleChange = (e) => {
@@ -57,38 +77,45 @@ const ProductForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        if (!imageFile) return setError("Debes subir una imagen válida (1080x1350).")
+        // Si NO estamos editando, la imagen es obligatoria.
+        if (!isEditing && !imageFile) return setError("Debes subir una imagen válida (1080x1350).")
 
         setLoading(true)
         setError('')
 
         try {
-            // 1. Subir imagen y obtener URL
-            const imageUrl = await uploadProductImage(imageFile)
+            let imageUrl = preview // Por defecto, mantenemos la imagen que ya tenía
 
-            // 2. Crear objeto final (convertimos precio a número)
-            const newProduct = {
-                ...formData,
-                price: parseFloat(formData.price),
-                image: imageUrl,
-                createdAt: new Date()
+            // Si el usuario subió una imagen nueva, la subimos a Firebase
+            if (imageFile) {
+                imageUrl = await uploadProductImage(imageFile)
             }
 
-            // 3. Guardar en Firestore
-            await createProduct(newProduct)
+            const finalProduct = {
+                ...formData,
+                price: parseFloat(formData.price),
+                image: imageUrl
+            }
 
-            // 4. Volver al panel
+            if (isEditing) {
+                await updateProduct(id, finalProduct)
+                Swal.fire({ title: 'Actualizado', icon: 'success', toast: true, position: 'bottom-end', timer: 2000, showConfirmButton: false })
+            } else {
+                finalProduct.createdAt = new Date()
+                await createProduct(finalProduct)
+                Swal.fire({ title: 'Creado', icon: 'success', toast: true, position: 'bottom-end', timer: 2000, showConfirmButton: false })
+            }
+
             navigate('/admin')
 
         } catch (err) {
-            console.error(err)
-            setError(err.message || "Error al crear el producto")
+            setError(err.message || "Error al guardar el producto")
             setLoading(false)
         }
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 pt-28 pb-12 px-4">
+        <div className="min-h-screen bg-[#fdfdf1] pt-28 pb-12 px-4">
             <div className="max-w-3xl mx-auto">
 
                 <Link to="/admin" className="inline-flex items-center gap-2 text-gray-500 hover:text-[#EC5E27] mb-6">

@@ -70,3 +70,9 @@ export const getProductById = async (productId) => {
         return null
     }
 }
+
+// 6. Actualizar un producto existente
+export const updateProduct = async (productId, updatedData) => {
+    const productRef = doc(db, COLLECTION_NAME, productId)
+    await updateDoc(productRef, updatedData)
+}

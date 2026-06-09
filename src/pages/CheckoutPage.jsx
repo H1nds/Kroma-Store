@@ -1,10 +1,14 @@
 import { useState } from 'react'
 import { useCart } from '../context/CartContext'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { ArrowLeft, MessageCircle, MapPin, User, Phone } from 'lucide-react'
+import { useAuth } from '../context/AuthContext' 
+import { createOrder } from '../services/orderService' 
 
 const CheckoutPage = () => {
-    const { cart, totalPrice } = useCart()
+    const navigate = useNavigate()
+    const { cart, totalPrice, clearCart } = useCart()
+    const { user } = useAuth()
 
     // Estado para los datos del formulario
     const [formData, setFormData] = useState({
@@ -23,21 +27,39 @@ const CheckoutPage = () => {
         })
     }
 
-    // --- LÓGICA MAESTRA: GENERAR MENSAJE DE WHATSAPP ---
-    const handlePlaceOrder = (e) => {
-        e.preventDefault() // Evitar que la página se recargue
+    // --- LÓGICA MAESTRA: GENERAR PEDIDO Y WHATSAPP ---
+    const handlePlaceOrder = async (e) => { // <--- Agregamos 'async'
+        e.preventDefault()
 
-        // 1. Número de WhatsApp de la tienda (TU NÚMERO) - Formato internacional (51 delante)
-        const phoneNumber = "985428501"
+        // 1. Generar un número de serie único tipo "KRM-X8F9A"
+        const serialNumber = 'KRM-' + Math.random().toString(36).substr(2, 5).toUpperCase()
 
-        // 2. Construimos el resumen de productos
-        let message = `*¡Hola Kroma! Quiero realizar el siguiente pedido:*\n\n`
+        // 2. Guardar en Firebase SOLO si el usuario está logueado
+        if (user) {
+            const newOrder = {
+                serial: serialNumber,
+                userEmail: user.email,
+                items: cart,
+                total: totalPrice,
+                status: 'pendiente', // Estado inicial
+                customer: formData,
+                createdAt: new Date().toISOString()
+            }
+            try {
+                await createOrder(newOrder)
+            } catch (error) {
+                console.error("Error guardando el pedido:", error)
+            }
+        }
+
+        // 3. Crear el mensaje de WhatsApp incluyendo el número de serie
+        const phoneNumber = "953704345"
+        let message = `*¡Hola Kroma! Quiero realizar el pedido #${serialNumber}:*\n\n`
 
         cart.forEach(item => {
-            message += `▫️ ${item.quantity}x ${item.name} - S/ ${(item.price * item.quantity).toFixed(2)}\n`
+            message += `🛍️ ${item.quantity}x ${item.name} - S/ ${(item.price * item.quantity).toFixed(2)}\n`
         })
 
-        // 3. Totales y Datos del Cliente
         message += `\n*TOTAL A PAGAR: S/ ${totalPrice.toFixed(2)}*\n`
         message += `----------------------------------\n`
         message += `👤 *Cliente:* ${formData.name}\n`
@@ -47,11 +69,16 @@ const CheckoutPage = () => {
         message += `----------------------------------\n`
         message += `Quedo a la espera de su confirmación.`
 
-        // 4. Codificamos el mensaje para URL (cambia espacios por %20, etc.)
-        const encodedMessage = encodeURIComponent(message)
+        const whatsappUrl = `https://wa.me/51${phoneNumber}?text=${encodeURIComponent(message)}`
 
-        // 5. Abrir WhatsApp Web o App
-        window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank')
+        // 1. Abrir WhatsApp en una NUEVA pestaña
+        window.open(whatsappUrl, '_blank')
+
+        // 2. Vaciar el carrito de compras
+        clearCart()
+
+        // 3. Redirigir la pestaña actual a la página de éxito
+        navigate('/orden-completada')
     }
 
     if (cart.length === 0) {

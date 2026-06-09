@@ -64,7 +64,7 @@ const FilterSidebar = ({ isOpen, closeSidebar, filters, handleFilterChange, bran
                     <input
                         type="range"
                         min="0"
-                        max="1000"
+                        max="2000"
                         value={filters.maxPrice}
                         onChange={(e) => handleFilterChange('maxPrice', e.target.value)}
                         className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#EC5E27]"
