@@ -4,21 +4,26 @@ logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
+# Dependencias
 node_modules
+
+# Producción
 dist
 dist-ssr
-*.local
 
-# Editor directories and files
+# Entornos y SO
+.env
+.local
+.DS_Store
+
+# Editores (VS Code, Visual Studio, etc)
 .vscode/*
 !.vscode/extensions.json
 .idea
-.env
-.DS_Store
+.vs/
 *.suo
+*.user
 *.ntvs*
 *.njsproj
 *.sln

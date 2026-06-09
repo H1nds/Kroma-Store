@@ -1,73 +1,90 @@
-import { useState, useMemo } from 'react'
-import { Filter, Search } from 'lucide-react'
-import { products } from '../data/products' // Nuestra "Base de Datos"
+import { useState, useMemo, useEffect } from 'react'
+import { Filter, Search, Loader } from 'lucide-react'
+import { getAllProducts } from '../services/productService' // <--- Usamos el servicio real
 import ProductCard from '../components/ProductCard'
 import FilterSidebar from '../components/FilterSidebar'
 
 const CatalogPage = () => {
-    // Estado para controlar si el sidebar móvil está abierto
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+    const [products, setProducts] = useState([]) // Estado para los productos REALES
+    const [loading, setLoading] = useState(true) // Estado de carga
 
-    // Estado de los filtros
+    // Filtros
     const [filters, setFilters] = useState({
         category: [],
         brand: [],
-        maxPrice: 1000,
+        maxPrice: 2000, // Aumenté el rango por si hay perfumes caros
         search: ''
     })
 
-    // Obtener lista única de marcas desde los productos para el sidebar
+    // 1. CARGAR DATOS DE FIREBASE AL ENTRAR
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const data = await getAllProducts()
+                setProducts(data)
+            } catch (error) {
+                console.error("Error cargando catálogo:", error)
+            } finally {
+                setLoading(false)
+            }
+        }
+        fetchProducts()
+    }, [])
+
+    // Obtener marcas únicas de los productos cargados
     const uniqueBrands = [...new Set(products.map(p => p.brand))]
 
-    // --- FUNCIÓN DE FILTRADO ---
-    // Usamos useMemo para que no recalcule en cada render innecesario
+    // 2. LÓGICA DE FILTRADO (Idéntica a la anterior, pero con datos reales)
     const filteredProducts = useMemo(() => {
         return products.filter(product => {
-            // 1. Filtro por Buscador (Texto)
             const matchesSearch = product.name.toLowerCase().includes(filters.search.toLowerCase()) ||
                 product.brand.toLowerCase().includes(filters.search.toLowerCase())
-
-            // 2. Filtro por Categoría (Si el array está vacío, muestra todo)
             const matchesCategory = filters.category.length === 0 || filters.category.includes(product.category)
-
-            // 3. Filtro por Marca
             const matchesBrand = filters.brand.length === 0 || filters.brand.includes(product.brand)
-
-            // 4. Filtro por Precio
             const matchesPrice = product.price <= filters.maxPrice
 
             return matchesSearch && matchesCategory && matchesBrand && matchesPrice
         })
-    }, [filters]) // Se ejecuta cada vez que 'filters' cambia
+    }, [filters, products])
 
-    // Manejador de cambios en los filtros
     const handleFilterChange = (type, value) => {
         if (type === 'maxPrice' || type === 'search') {
             setFilters(prev => ({ ...prev, [type]: value }))
         } else {
-            // Para arrays (checkboxes): si ya existe lo quita, si no existe lo agrega
             setFilters(prev => {
                 const list = prev[type]
                 const newList = list.includes(value)
-                    ? list.filter(item => item !== value) // Quitar
-                    : [...list, value] // Agregar
+                    ? list.filter(item => item !== value)
+                    : [...list, value]
                 return { ...prev, [type]: newList }
             })
         }
+    }
+
+    // --- VISTA DE CARGA ---
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-[#fdfdf1] flex items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader className="animate-spin text-[#EC5E27]" size={48} />
+                    <p className="font-kroma-logo text-[#2b323f] animate-pulse">Cargando colección...</p>
+                </div>
+            </div>
+        )
     }
 
     return (
         <div className="bg-[#fdfdf1] min-h-screen pt-24 pb-12">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-                {/* --- ENCABEZADO Y BUSCADOR --- */}
+                {/* ENCABEZADO */}
                 <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
                     <div>
                         <h1 className="text-4xl font-kroma-logo text-[#2b323f] mb-2">Colección</h1>
                         <p className="text-gray-500">{filteredProducts.length} resultados encontrados</p>
                     </div>
 
-                    {/* Barra de búsqueda y Botón Filtros (Móvil) */}
                     <div className="flex gap-4 w-full md:w-auto">
                         <div className="relative flex-1 md:w-80">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
@@ -89,7 +106,6 @@ const CatalogPage = () => {
                 </div>
 
                 <div className="flex gap-8">
-                    {/* --- SIDEBAR (IZQUIERDA) --- */}
                     <FilterSidebar
                         isOpen={isSidebarOpen}
                         closeSidebar={() => setIsSidebarOpen(false)}
@@ -98,7 +114,6 @@ const CatalogPage = () => {
                         brands={uniqueBrands}
                     />
 
-                    {/* --- GRILLA DE PRODUCTOS (DERECHA) --- */}
                     <div className="flex-1">
                         {filteredProducts.length > 0 ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -107,11 +122,10 @@ const CatalogPage = () => {
                                 ))}
                             </div>
                         ) : (
-                            // Mensaje si no hay resultados
                             <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-gray-300">
-                                <p className="text-xl text-gray-400 font-kroma-logo mb-2">No encontramos ese perfume.</p>
+                                <p className="text-xl text-gray-400 font-kroma-logo mb-2">No encontramos resultados.</p>
                                 <button
-                                    onClick={() => setFilters({ category: [], brand: [], maxPrice: 1000, search: '' })}
+                                    onClick={() => setFilters({ category: [], brand: [], maxPrice: 2000, search: '' })}
                                     className="text-[#EC5E27] font-bold hover:underline"
                                 >
                                     Limpiar filtros
@@ -120,7 +134,6 @@ const CatalogPage = () => {
                         )}
                     </div>
                 </div>
-
             </div>
         </div>
     )
