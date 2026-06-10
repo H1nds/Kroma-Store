@@ -1,6 +1,10 @@
 import { X } from 'lucide-react'
 
 const FilterSidebar = ({ isOpen, closeSidebar, filters, handleFilterChange, brands }) => {
+
+    // MAGIA AQUÍ: Tomamos la lista de marcas, eliminamos los duplicados y los ordenamos de la A a la Z.
+    const uniqueBrands = [...new Set(brands)].sort();
+
     return (
         <>
             {/* Overlay oscuro para móviles cuando se abre el filtro */}
@@ -44,7 +48,8 @@ const FilterSidebar = ({ isOpen, closeSidebar, filters, handleFilterChange, bran
                 <div className="mb-8">
                     <h3 className="text-sm font-bold uppercase tracking-widest text-[#2b323f] mb-4">Marcas</h3>
                     <div className="space-y-3">
-                        {brands.map((brand) => (
+                        {/* Usamos uniqueBrands en lugar de brands */}
+                        {uniqueBrands.map((brand) => (
                             <label key={brand} className="flex items-center gap-3 cursor-pointer group">
                                 <input
                                     type="checkbox"
