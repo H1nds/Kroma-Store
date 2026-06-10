@@ -1,9 +1,21 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion' // Importamos la magia de las animaciones
 import { ArrowRight } from 'lucide-react'
-import heroImage from '../assets/hero-perfume.jpg' // Tu imagen
+import { getHeroImage } from '../services/productService' // Importamos el servicio
+import defaultHeroImage from '../assets/hero-perfume.jpg' // Renombramos a default
 
 const Hero = () => {
+    // 1. Estado para almacenar la imagen (inicia con la que tienes localmente)
+    const [heroImg, setHeroImg] = useState(defaultHeroImage)
+
+    // 2. Al cargar, verificamos si hay una portada en Firebase
+    useEffect(() => {
+        getHeroImage().then(url => {
+            if (url) setHeroImg(url)
+        })
+    }, [])
+
     return (
         <section className="relative w-full min-h-screen flex items-center bg-[#fdfdf1] overflow-hidden pt-20">
 
@@ -64,32 +76,33 @@ const Hero = () => {
                     </motion.div>
                 </div>
 
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.95 }} 
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.8, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-                  className="relative z-10 w-full"
+                {/* --- COLUMNA DERECHA: IMAGEN --- */}
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.8, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+                    className="relative z-10 w-full"
                 >
-                  
-                  <div className="relative w-full aspect-[4/5] rounded-[2rem] overflow-hidden shadow-2xl bg-[#f0f0e8]">
-                     <img 
-                       src={heroImage} 
-                       alt="Perfume exclusivo" 
-                       
-                       className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000"
-                     />                     
-                     <div className="absolute inset-0 bg-gradient-to-t from-[#2b323f]/10 via-transparent to-transparent" />
-                  </div>
 
-                  <motion.div 
-                    initial={{ y: 30, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 1.2, duration: 0.8 }}
-                    className="absolute -bottom-6 -left-6 bg-[#fdfdf1]/90 backdrop-blur-sm p-6 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] max-w-[200px] hidden md:block border border-[#2b323f]/5"
-                  >
-                     <p className="font-kroma-logo text-3xl text-[#EC5E27] mb-1">100%</p>
-                     <p className="text-xs text-[#2b323f]/70 uppercase tracking-wider font-medium">Originales & <br/> Entrega Segura</p>
-                  </motion.div>
+                    <div className="relative w-full aspect-[4/5] rounded-[2rem] overflow-hidden shadow-2xl bg-[#f0f0e8]">
+                        {/* 3. Renderizamos la imagen dinámica en lugar de la estática */}
+                        <img
+                            src={heroImg}
+                            alt="Perfume exclusivo"
+                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#2b323f]/10 via-transparent to-transparent" />
+                    </div>
+
+                    <motion.div
+                        initial={{ y: 30, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 1.2, duration: 0.8 }}
+                        className="absolute -bottom-6 -left-6 bg-[#fdfdf1]/90 backdrop-blur-sm p-6 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] max-w-[200px] hidden md:block border border-[#2b323f]/5"
+                    >
+                        <p className="font-kroma-logo text-3xl text-[#EC5E27] mb-1">100%</p>
+                        <p className="text-xs text-[#2b323f]/70 uppercase tracking-wider font-medium">Originales & <br /> Entrega Segura</p>
+                    </motion.div>
 
                 </motion.div>
 

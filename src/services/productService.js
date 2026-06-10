@@ -1,7 +1,7 @@
 import { db, storage } from '../firebase/config'
 import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage'
-import { getDoc } from 'firebase/firestore'
+import { getDoc, setDoc } from 'firebase/firestore'
 
 const COLLECTION_NAME = 'products'
 
@@ -75,4 +75,17 @@ export const getProductById = async (productId) => {
 export const updateProduct = async (productId, updatedData) => {
     const productRef = doc(db, COLLECTION_NAME, productId)
     await updateDoc(productRef, updatedData)
+}
+
+// 7. Guardar la imagen de Portada (Hero)
+export const updateHeroImage = async (imageUrl) => {
+    const heroRef = doc(db, 'settings', 'hero')
+    await setDoc(heroRef, { imageUrl })
+}
+
+// 8. Obtener la imagen de Portada
+export const getHeroImage = async () => {
+    const heroRef = doc(db, 'settings', 'hero')
+    const docSnap = await getDoc(heroRef)
+    return docSnap.exists() ? docSnap.data().imageUrl : null
 }
