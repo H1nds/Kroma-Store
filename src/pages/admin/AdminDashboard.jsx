@@ -72,7 +72,7 @@ const AdminDashboard = () => {
                 </div>
 
                 {/* --- Contenedor Principal de la Tabla --- */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
 
                     {/* ESTE DIV CREA EL SCROLL HORIZONTAL EN CELULARES */}
                     <div className="overflow-x-auto custom-scrollbar">
